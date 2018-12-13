@@ -1,0 +1,6 @@
+FROM scratch
+ADD . /
+CMD ["/greeter_client"]
+
+
+

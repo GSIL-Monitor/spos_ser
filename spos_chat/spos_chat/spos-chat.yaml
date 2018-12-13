@@ -1,0 +1,56 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: spos-chat
+  name: spos-chat
+  annotations:
+    getambassador.io/config: |
+      ---
+      apiVersion: ambassador/v0
+      kind: Mapping
+      name: spos_chat_mapping
+      grpc: true
+      prefix: /spos.Chat/
+      rewrite: /spos.Chat/
+      service: spos-chat
+      timeout_ms: 30000	
+#      rate_limits:
+#        - descriptor: A test case
+#          headers:
+#            - "x-ambassador-test-allow"
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    name: spos-chat
+    targetPort: spos-api
+  selector:
+    service: spos-chat
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: spos-chat
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service: spos-chat
+    spec:
+      containers:
+      - name: spos-chat
+        image: patlihh/spos-chat:v1.0
+        ports:
+        - name: spos-api
+          containerPort: 9998
+        env:
+          - name: PORT
+            value: "9998"
+          - name: WORDPRESS_DB_PASSWORD
+            value: "Unitone@2018"
+          - name: WORDPRESS_DB_HOST
+            value: "192.168.20.107"
+      restartPolicy: Always

@@ -1,0 +1,6 @@
+FROM scratch
+ADD . /
+CMD ["/spos-lang-ssl"]
+
+
+
